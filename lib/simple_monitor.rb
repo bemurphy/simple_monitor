@@ -4,9 +4,14 @@ module SimpleMonitor
   attr_reader :options
   attr_accessor :logger
 
+  # Sets if logging should only occur when
+  # you call it, skips implementation logging
+  attr_accessor :only_explicit_logging
+
   LOG_METHODS = %w[info warn error debug].freeze
 
   def initialize(options = {})
+    self.only_explicit_logging = options.delete(:only_explicit_logging)
     @options = options
   end
 
@@ -25,7 +30,9 @@ module SimpleMonitor
   end
 
   def warn_alert
-    warn(alert_log_message)
+    unless only_explicit_logging
+      warn(alert_log_message)
+    end
   end
 
   # Public: Message to log in case of an alert
@@ -38,7 +45,9 @@ module SimpleMonitor
   end
 
   def info_passed
-    info(passed_log_message)
+    unless only_explicit_logging
+      info(passed_log_message)
+    end
   end
 
   # Public: Message to log in case of a check passing

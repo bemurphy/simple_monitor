@@ -20,6 +20,11 @@ describe SimpleMonitor do
     monitor = TestMonitor.new(:foo => :bar)
     monitor.options[:foo].should == :bar
   end
+
+  it "extacts :only_explicit_logging from the passed options" do
+    TestMonitor.new.only_explicit_logging.should be_nil
+    TestMonitor.new(:only_explicit_logging => true).only_explicit_logging.should be_true
+  end
 end
 
 describe SimpleMonitor, "logger" do
@@ -66,6 +71,12 @@ describe SimpleMonitor, "running the check" do
       subject.check
     end
 
+    it "can bypass the logging if only_explicit_logging is set" do
+      subject.only_explicit_logging = true
+      logger.should_not_receive(:warn)
+      subject.check
+    end
+
     it "sends an alert" do
       subject.check
       subject.last_alert.should == "Test Monitor Alert"
@@ -81,6 +92,12 @@ describe SimpleMonitor, "running the check" do
 
     it "logs info that the check passed" do
       logger.should_receive(:info).with(/TestMonitor --.*passed/)
+      subject.check
+    end
+
+    it "can bypass the logging if only_explicit_logging is set" do
+      subject.only_explicit_logging = true
+      logger.should_not_receive(:info)
       subject.check
     end
 
