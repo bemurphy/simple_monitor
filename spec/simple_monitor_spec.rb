@@ -48,6 +48,18 @@ describe SimpleMonitor, "logger" do
     Object.send(:remove_const, :Rails)
   end
 
+  it "is defaulted to the Padrino.logger if present" do
+    module Padrino
+      def self.logger
+        :padrino_logger
+      end
+    end
+
+    subject.logger.should == :padrino_logger
+
+    Object.send(:remove_const, :Padrino)
+  end
+
   it "sends info, warn, error, and debug methods to it prefixed by the class name" do
     stub_logger = stub('logger')
     subject.logger = stub_logger

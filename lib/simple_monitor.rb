@@ -84,6 +84,8 @@ module SimpleMonitor
     @logger ||=
       if defined?(Rails)
         Rails.logger
+      elsif defined?(Padrino)
+        Padrino.logger
       else
         require "logger"
         Logger.new(STDOUT)
