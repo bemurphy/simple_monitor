@@ -50,7 +50,7 @@ monitor = HighJobMonitor.new(:job_count_threshold => 99)
 monitor.check
 ```
 
-For a typical application, it could be desireable to define an
+For a typical application, it could be desirable to define an
 AppMonitor class with a default send_alert method, and have your
 individual monitor classes inherit from that.
 
