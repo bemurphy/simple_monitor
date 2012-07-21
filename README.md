@@ -41,7 +41,7 @@ class HighJobMonitor
     Queue.jobs.count > options[:job_count_threshold]
   end
 
-  # Alert sending method of your choice.  SimpleMonitor
+  # Alert sending implementation of your choice.  SimpleMonitor
   # leaves this up to you
   def send_alert
     Mailer.deliver_high_job_alert(Queue.jobs.count)
