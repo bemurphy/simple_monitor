@@ -10,6 +10,9 @@ module SimpleMonitor
     @options = options
   end
 
+  # Runs the check and sends an alert if needed
+  #
+  # Returns false if the check failed, true if passed
   def check
     if needs_alert?
       warn_alert
@@ -25,6 +28,11 @@ module SimpleMonitor
     warn(alert_log_message)
   end
 
+  # Public: Message to log in case of an alert
+  #
+  # Override this in your monitors to inject data
+  #
+  # Returns: String
   def alert_log_message
     "check generated an alert"
   end
@@ -33,18 +41,36 @@ module SimpleMonitor
     info(passed_log_message)
   end
 
+  # Public: Message to log in case of a check passing
+  #
+  # Override this in your monitors to inject data
+  #
+  # Returns: String
   def passed_log_message
     "check passed"
   end
 
+  # Public: Conditional method to check if the alert should be sent
+  #
+  # This should be overridden in your individual monitor classes
+  #
+  # Returns a boolean
   def needs_alert?
     false
   end
 
+  # Public: Send out an alert
+  #
+  # This should be overridden in your individual monitor classes,
+  # or base monitor class.  This might be to send an SMS, email
+  # or IRC message
   def send_alert
     #no-op
   end
 
+  # A memoized logger.
+  #
+  # Returns: a logger that responds to warn, info, debug, and error
   def logger
     @logger ||=
       if defined?(Rails)
@@ -55,6 +81,8 @@ module SimpleMonitor
       end
   end
 
+  # Generated methods delegated to the logger.  This is for convenience
+  # as well as for prefixing the monitor class name into the message
   LOG_METHODS.each do |method|
     define_method method do |message|
       message = [self.class.name, message.to_s].join(" -- ")
