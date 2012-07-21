@@ -1,5 +1,4 @@
 require "simple_monitor/version"
-require "logger"
 
 module SimpleMonitor
   attr_reader :options
@@ -49,6 +48,7 @@ module SimpleMonitor
       if defined?(Rails)
         Rails.logger
       else
+        require "logger"
         Logger.new(STDOUT)
       end
   end
