@@ -1,28 +1,11 @@
 require "simple_monitor/version"
 require "logger"
 
-class SimpleMonitor
+module SimpleMonitor
   attr_reader :options
+  attr_accessor :logger
 
-  class << self
-    def logger_factory
-      @@logger_factory ||= Proc.new {
-        if defined?(Rails)
-          Rails.logger
-        else
-          Logger.new(STDOUT)
-        end
-      }
-    end
-
-    def logger_factory=(callable)
-      @@logger_factory = callable
-    end
-
-    def reset_logger_factory
-      @@logger_factory = nil
-    end
-  end
+  LOG_METHODS = %w[info warn error debug].freeze
 
   def initialize(options = {})
     @options = options
@@ -30,15 +13,23 @@ class SimpleMonitor
 
   def check
     if needs_alert?
-      warn(alert_log_message)
+      warn_alert
       send_alert
     else
-      info(passed_log_message)
+      info_passed
     end
+  end
+
+  def warn_alert
+    warn(alert_log_message)
   end
 
   def alert_log_message
     "check generated an alert"
+  end
+
+  def info_passed
+    info(passed_log_message)
   end
 
   def passed_log_message
@@ -49,11 +40,20 @@ class SimpleMonitor
     false
   end
 
-  def logger
-    @logger ||= SimpleMonitor.logger_factory.call
+  def send_alert
+    #no-op
   end
 
-  %w[info warn error debug].each do |method|
+  def logger
+    @logger ||=
+      if defined?(Rails)
+        Rails.logger
+      else
+        Logger.new(STDOUT)
+      end
+  end
+
+  LOG_METHODS.each do |method|
     define_method method do |message|
       message = [self.class.name, message.to_s].join(" -- ")
       logger.send(method, message)
