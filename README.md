@@ -21,7 +21,6 @@ or put it in your Gemfile:
 
 ```ruby
 # Gemfile
-
 gem 'simple_monitor'
 ```
 
