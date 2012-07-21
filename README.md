@@ -35,13 +35,15 @@ require "simple_monitor"
 class HighJobMonitor
   include SimpleMonitor
 
+  # This is the most important method you should override
+  # It returns true/false to determine if there's an alert
   def needs_alert?
     Queue.jobs.count > options[:job_count_threshold]
   end
 
+  # Alert sending method of your choice.  SimpleMonitor
+  # leaves this up to you
   def send_alert
-    # Alert sending method of your choice.  SimpleMonitor
-    # leaves this up to you
     Mailer.deliver_high_job_alert(Queue.jobs.count)
   end
 end
