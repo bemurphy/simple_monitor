@@ -7,9 +7,10 @@ Gem::Specification.new do |s|
   s.version     = SimpleMonitor::VERSION
   s.authors     = ["Brendon Murphy"]
   s.email       = ["xternal1+github@gmail.com"]
+  s.licenses    = ["MIT"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{Send alerts based on simple monitored conditions in your app}
+  s.description = s.description
 
   s.rubyforge_project = "simple_monitor"
 
