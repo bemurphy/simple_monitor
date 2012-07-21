@@ -21,7 +21,7 @@ describe SimpleMonitor do
     monitor.options[:foo].should == :bar
   end
 
-  it "extacts :only_explicit_logging from the passed options" do
+  it "extracts :only_explicit_logging from the passed options" do
     TestMonitor.new.only_explicit_logging.should be_nil
     TestMonitor.new(:only_explicit_logging => true).only_explicit_logging.should be_true
   end
