@@ -70,6 +70,10 @@ describe SimpleMonitor, "running the check" do
       subject.check
       subject.last_alert.should == "Test Monitor Alert"
     end
+
+    it "returns false" do
+      subject.check.should == false
+    end
   end
 
   context "when no alert needs sending" do
@@ -83,6 +87,10 @@ describe SimpleMonitor, "running the check" do
     it "doesn't send an alert" do
       subject.check
       subject.last_alert.should be_nil
+    end
+
+    it "returns true" do
+      subject.check.should == true
     end
   end
 end

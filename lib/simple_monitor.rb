@@ -14,8 +14,10 @@ module SimpleMonitor
     if needs_alert?
       warn_alert
       send_alert
+      false
     else
       info_passed
+      true
     end
   end
 
