@@ -1,6 +1,8 @@
 require 'spec_helper'
 
-class TestMonitor < SimpleMonitor
+class TestMonitor
+  include SimpleMonitor
+
   attr_reader :last_alert
 
   def needs_alert?
@@ -13,15 +15,15 @@ class TestMonitor < SimpleMonitor
 end
 
 describe SimpleMonitor do
-  it "is initilized with optional options" do
-    monitor = SimpleMonitor.new
-    monitor = SimpleMonitor.new(:foo => :bar)
+  it "is initialized with optional options" do
+    monitor = TestMonitor.new
+    monitor = TestMonitor.new(:foo => :bar)
     monitor.options[:foo].should == :bar
   end
 end
 
 describe SimpleMonitor, "logger" do
-  let(:subject) { TestMonitor.new}
+  subject { TestMonitor.new }
 
   it "is defaulted to Logger.new(STDOUT)" do
     subject.logger.should be_kind_of(Logger)
@@ -41,15 +43,9 @@ describe SimpleMonitor, "logger" do
     Object.send(:remove_const, :Rails)
   end
 
-  it "is configurable by setting the class logger_factory to a callable" do
-    SimpleMonitor.logger_factory = Proc.new { :factory_override }
-    subject.logger.should == :factory_override
-    SimpleMonitor.reset_logger_factory
-  end
-
   it "sends info, warn, error, and debug methods to it prefixed by the class name" do
     stub_logger = stub('logger')
-    SimpleMonitor.logger_factory = Proc.new { stub_logger }
+    subject.logger = stub_logger
     %w[info warn error debug].each do |log_method|
       stub_logger.should_receive(log_method).with("TestMonitor -- #{log_method}")
       subject.send(log_method, log_method)
@@ -58,10 +54,9 @@ describe SimpleMonitor, "logger" do
 end
 
 describe SimpleMonitor, "running the check" do
-  let(:subject) { TestMonitor.new }
+  subject { TestMonitor.new }
   let(:logger) { stub('logger', :warn => nil, :info => nil) }
-  before { SimpleMonitor.logger_factory = Proc.new { logger } }
-  after { SimpleMonitor.reset_logger_factory }
+  before { subject.logger = logger }
 
   context "when an alert needs sending" do
     before { subject.options[:force_alert] = true }
@@ -89,5 +84,26 @@ describe SimpleMonitor, "running the check" do
       subject.check
       subject.last_alert.should be_nil
     end
+  end
+end
+
+describe SimpleMonitor, "supports a class including SimpleMonitor" do
+  class ChildTestMonitor < TestMonitor
+    def needs_alert?
+      true
+    end
+
+    def send_alert
+      @last_alert = "CHILD HERE"
+    end
+  end
+
+  subject { ChildTestMonitor.new }
+  let(:logger) { stub('logger', :warn => nil, :info => nil) }
+  before { subject.logger = logger }
+
+  it "to be inherited" do
+    subject.check
+    subject.last_alert.should == "CHILD HERE"
   end
 end
